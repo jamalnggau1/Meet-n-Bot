@@ -101,6 +101,7 @@ class Main(object):
                         print("Something went wrong! There is no partner in the list, while there should be!")
 
 
+                # happens when user is NEITER searching, nor in a chat with a stranger
                 else:
                     print("Case not handeled yet!")
 
