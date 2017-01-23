@@ -3,6 +3,7 @@ __author__ = 'Rico'
 
 from twx.botapi import TelegramBot
 from app.update_handler import get_updates
+from app.message_types import MessageTypes
 
 
 class Main(object):
@@ -13,6 +14,7 @@ class Main(object):
     chatting_users = [[]] * 0
     searching_users = []
     DEV_ID = 24421134
+
 
     def update_loop(self):
         while True:
@@ -25,17 +27,34 @@ class Main(object):
     def analyze_messages(self):
         try:
             while len(self.left_msgs) > 0:
-            #for update in self.left_msgs:
                 update = self.left_msgs[0]
-                print(update)
-                # elif user is in 'state' menu:
-                if isinstance(update.message.text, str):
+                print(update)  # TODO just for debugging
+                text_orig = ""
+                text = ""
+                message_type = 0
 
+                #TODO auto remove chats if no message for a certain time?
+
+                if isinstance(update.message.text, str):
+                    # If message is text
                     text_orig = str(update.message.text)
                     text = text_orig.lower()
+                    message_type = MessageTypes.TYPE_TEXT
+
+                elif update.message.sticker is not None:
+                    print("Message is a sticker")
+                    print(str(update.message.sticker.file_id))
+                    message_type = MessageTypes.TYPE_STICKER
+
+                elif update.message.photo is not None:
+                    print("Message is a photo")
+                    print(str(update.message.photo))
                 else:
-                    text_orig = "* Your chat partner sent some media. Stickers and media are not supported yet! *"
-                    text = ""
+                    # Setting type to "text", so that the partner get's notified of it
+                    print("* Someone sent some unsupported media, sorry. *")
+                    message_type = MessageTypes.TYPE_TEXT
+                    text_orig = "* Your chat partner sent some unsupported media, sorry. *"
+                    text = "* Your chat partner sent some unsupported media, sorry. *"
 
                 user_id = update.message.sender.id
                 # first_name = update.message.sender.first_name
@@ -94,12 +113,15 @@ class Main(object):
                 elif (user_id not in self.searching_users) and (self.user_already_chatting(user_id) >= 0):
                     # send message directly to the other chat
                     partner_id = self.get_partner_id(user_id)
+                    # additional check, that there is indeed a partner.
                     if partner_id != -1:
-                        message = "Stranger: " + text_orig
-                        self.bot.send_message(partner_id, message).wait()
+                        if message_type == MessageTypes.TYPE_TEXT:
+                            message = "Stranger: " + text_orig
+                            self.bot.send_message(partner_id, message).wait()
+                        elif message_type == MessageTypes.TYPE_STICKER:
+                            self.bot.send_sticker(partner_id, update.message.sticker.file_id).wait()
                     else:
                         print("Something went wrong! There is no partner in the list, while there should be!")
-
 
                 # happens when user is NEITER searching, nor in a chat with a stranger
                 else:
