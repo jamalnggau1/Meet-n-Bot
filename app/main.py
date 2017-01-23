@@ -6,7 +6,7 @@ from app.update_handler import get_updates
 
 
 class Main(object):
-    BOT_TOKEN = <your-API-Token-here
+    # BOT_TOKEN = <your-API-Token-here>
     bot = TelegramBot(BOT_TOKEN)
     offset = 0
     left_msgs = [[]] * 0
@@ -38,8 +38,8 @@ class Main(object):
                     text = ""
 
                 user_id = update.message.sender.id
-                first_name = update.message.sender.first_name
-                update_id = update.update_id
+                # first_name = update.message.sender.first_name
+                # update_id = update.update_id
 
                 # If message is a command
                 if text.startswith("/"):
@@ -57,6 +57,9 @@ class Main(object):
                             # add both users to the list of chatting users with the user_id of the other user.
                             self.chatting_users.append([user_id, partner_id])
                             self.chatting_users.append([partner_id, user_id])
+
+                            self.bot.send_message(user_id, "You are connected to a stranger. Have fun and be nice!").wait()
+                            self.bot.send_message(partner_id, "You are connected to a stranger. Have fun and be nice!").wait()
                         else:
                             # if no user is searching, add him to the list of searching users.
                             # TODO later when you can search for specific gender, this condition must be changed
@@ -75,6 +78,8 @@ class Main(object):
 
                         elif self.user_already_chatting(user_id) >= 0:
                             # remove both users from chatting users
+                            partner_id = self.get_partner_id(user_id)
+
                             index = self.user_already_chatting(user_id)
                             del self.chatting_users[index]
 
@@ -82,18 +87,19 @@ class Main(object):
                             del self.chatting_users[partner_index]
 
                             # send message that other user left the chat
-                            partner_id = self.get_partner_id(user_id)
                             self.bot.send_message(partner_id, "Your partner left the chat").wait()
                             self.bot.send_message(user_id, "You left the chat!").wait()
 
+                # if user is in a chat
                 elif (user_id not in self.searching_users) and (self.user_already_chatting(user_id) >= 0):
                     # send message directly to the other chat
                     partner_id = self.get_partner_id(user_id)
                     if partner_id != -1:
                         message = "Stranger: " + text_orig
-                        # sendmessage()
+                        self.bot.send_message(partner_id, message).wait()
                     else:
                         print("Something went wrong! There is no partner in the list, while there should be!")
+
 
                 else:
                     print("Case not handeled yet!")
@@ -136,7 +142,8 @@ class Main(object):
 
     def set_message_answered(self):
         if len(self.left_msgs) > 0:
-            self.offset = self.left_msgs[0].update_id
+            update = self.left_msgs[0]
+            self.offset = update.update_id
             self.left_msgs.pop(0)
             print("Un-Answered Messages: " + str(len(self.left_msgs)))
 
