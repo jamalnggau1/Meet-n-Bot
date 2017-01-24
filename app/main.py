@@ -56,6 +56,7 @@ class Main(object):
                     # Setting type to "text", so that the partner get's notified of it
                     print("* Someone sent some unsupported media, sorry. *")
                     message_type = MessageTypes.TYPE_TEXT
+                    # TODO here is a potential risk!
                     text_orig = bot_sends + "*Your chat partner sent some unsupported media, sorry. *"
                     text = bot_sends + "*Your chat partner sent some unsupported media, sorry. *"
 
@@ -88,7 +89,7 @@ class Main(object):
                             self.searching_users.append(user_id)
                             self.bot.send_message(user_id, bot_sends + "Added you to the searching users!", parse_mode="Markdown").wait()
 
-                    elif user_id in self.searching_users:
+                    elif (command == "start") and (user_id in self.searching_users):
                         self.bot.send_message(user_id, bot_sends + "You are already searching. Please wait!", parse_mode="Markdown").wait()
 
                     if (command == "stop") and ((user_id in self.searching_users) or (self.user_already_chatting(user_id) >= 0)):
