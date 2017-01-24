@@ -131,7 +131,7 @@ class Main(object):
                         elif message_type == MessageTypes.TYPE_STICKER:
                             self.bot.send_sticker(partner_id, update.message.sticker.file_id).wait()
                         elif message_type == MessageTypes.TYPE_VOICE:
-                            self.bot.send_voice(partner_id, update.message.voice.file_id).wait()
+                            self.bot.send_voice(partner_id, update.message.voice.file_id, duration=update.message.voice.duration).wait()
                         elif message_type == MessageTypes.TYPE_AUDIO:
                             self.bot.send_audio(partner_id, update.message.audio.file_id).wait()
                         elif message_type == MessageTypes.TYPE_VIDEO:
