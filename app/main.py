@@ -49,7 +49,7 @@ class Main(object):
                     message_type = MessageTypes.TYPE_STICKER
 
                 elif update.message.photo is not None:
-                    print("\U0001F4F7 Message is a photo")
+                    print("Message is a photo")
                     print(str(update.message.photo))
                 else:
                     # Setting type to "text", so that the partner get's notified of it
