@@ -9,3 +9,4 @@ class MessageTypes(Enum):
     TYPE_VOICE = 4
     TYPE_AUDIO = 4
     TYPE_VIDEO = 6
+    TYPE_FILE = 7
