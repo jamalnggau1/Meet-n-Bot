@@ -16,7 +16,6 @@ class Main(object):
     searching_users = []
     DEV_ID = 24421134
 
-
     def update_loop(self):
         while True:
             update_list = get_updates(self.offset, self.bot)
@@ -43,18 +42,21 @@ class Main(object):
                     text_orig = str(update.message.text)
                     text = text_orig.lower()
                     message_type = MessageTypes.TYPE_TEXT
-
-                elif update.message.sticker is not None:
-                    print("Message is a sticker")
-                    print(str(update.message.sticker.file_id))
-                    message_type = MessageTypes.TYPE_STICKER
-
                 elif update.message.photo is not None:
-                    print("Message is a photo")
-                    print(str(update.message.photo))
+                    message_type = MessageTypes.TYPE_PHOTO
+                elif update.message.sticker is not None:
+                    message_type = MessageTypes.TYPE_STICKER
+                elif update.message.voice is not None:
+                    message_type = MessageTypes.TYPE_VOICE
+                elif update.message.audio is not None:
+                    message_type = MessageTypes.TYPE_AUDIO
+                elif update.message.video is not None:
+                    message_type = MessageTypes.TYPE_VIDEO
+                elif update.message.document is not None:
+                    message_type = MessageTypes.TYPE_FILE
                 else:
                     # Setting type to "text", so that the partner get's notified of it
-                    print("* Someone sent some unsupported media, sorry. *")
+                    print("* Someone sent some unsupported media*")
                     message_type = MessageTypes.TYPE_TEXT
                     # TODO here is a potential risk!
                     text_orig = bot_sends + "*Your chat partner sent some unsupported media, sorry. *"
@@ -91,7 +93,6 @@ class Main(object):
 
                     elif (command == "start") and (user_id in self.searching_users):
                         self.bot.send_message(user_id, bot_sends + "You are already searching. Please wait!", parse_mode="Markdown").wait()
-
                     if (command == "stop") and ((user_id in self.searching_users) or (self.user_already_chatting(user_id) >= 0)):
 
                         if user_id in self.searching_users:
@@ -120,11 +121,26 @@ class Main(object):
                     # additional check, that there is indeed a partner.
                     if partner_id != -1:
                         if message_type == MessageTypes.TYPE_TEXT:
-                            # send the following message using html syntax
                             message = stranger_sends + html.escape(text_orig)
                             self.bot.send_message(partner_id, message, parse_mode="HTML").wait()
+                        elif message_type == MessageTypes.TYPE_PHOTO:
+                            file_id = ""
+                            last_file_size = 0
+                            for photo in update.message.photo:
+                                if photo.file_size >= last_file_size:
+                                    file_id = photo.file_id
+                            self.bot.send_photo(partner_id, file_id).wait()
+                            print("sent file with size: " + str(last_file_size))
                         elif message_type == MessageTypes.TYPE_STICKER:
                             self.bot.send_sticker(partner_id, update.message.sticker.file_id).wait()
+                        elif message_type == MessageTypes.TYPE_VOICE:
+                            self.bot.send_voice(partner_id, update.message.voice.file_id, duration=update.message.voice.duration).wait()
+                        elif message_type == MessageTypes.TYPE_AUDIO:
+                            self.bot.send_audio(partner_id, update.message.audio.file_id).wait()
+                        elif message_type == MessageTypes.TYPE_VIDEO:
+                            self.bot.send_video(partner_id, update.message.video.file_id).wait()
+                        elif message_type == MessageTypes.TYPE_FILE:
+                            self.bot.send_document(partner_id, update.message.document.file_id).wait()
                     else:
                         print("Something went wrong! There is no partner in the list, while there should be!")
 
