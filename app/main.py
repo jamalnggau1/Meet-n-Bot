@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Rico'
 
+import html
 from twx.botapi import TelegramBot
 from app.update_handler import get_updates
 from app.message_types import MessageTypes
@@ -26,7 +27,7 @@ class Main(object):
 
     def analyze_messages(self):
         bot_sends = "\U0001F916 *Bot:* "
-        stranger_sends = "\U0001F464 *Stranger:* " 
+        stranger_sends = "\U0001F464 <b>Stranger:</b> " 
         try:
             while len(self.left_msgs) > 0:
                 update = self.left_msgs[0]
@@ -118,7 +119,8 @@ class Main(object):
                     # additional check, that there is indeed a partner.
                     if partner_id != -1:
                         if message_type == MessageTypes.TYPE_TEXT:
-                            message = stranger_sends + text_orig
+                            #send the following message using html syntax
+                            message = stranger_sends + html.escape(text_orig)
                             self.bot.send_message(partner_id, message).wait()
                         elif message_type == MessageTypes.TYPE_STICKER:
                             self.bot.send_sticker(partner_id, update.message.sticker.file_id).wait()
