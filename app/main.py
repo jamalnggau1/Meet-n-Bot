@@ -87,7 +87,7 @@ class Main(object):
                             self.searching_users.append(user_id)
                             self.bot.send_message(user_id, "Added you to the searching users!").wait()
 
-                    elif user_id in self.searching_users:
+                    elif (command == "start") and (user_id in self.searching_users):
                         self.bot.send_message(user_id, "You are already searching. Please wait!").wait()
 
                     if (command == "stop") and ((user_id in self.searching_users) or (self.user_already_chatting(user_id) >= 0)):
