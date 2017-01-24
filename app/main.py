@@ -80,16 +80,16 @@ class Main(object):
                             self.chatting_users.append([user_id, partner_id])
                             self.chatting_users.append([partner_id, user_id])
 
-                            self.bot.send_message(user_id, bot_sends + "You are connected to a stranger. Have fun and be nice!").wait()
-                            self.bot.send_message(partner_id, bot_sends + "You are connected to a stranger. Have fun and be nice!").wait()
+                            self.bot.send_message(user_id, bot_sends + "You are connected to a stranger. Have fun and be nice!", parse_mode="Markdown").wait()
+                            self.bot.send_message(partner_id, bot_sends + "You are connected to a stranger. Have fun and be nice!", parse_mode="Markdown").wait()
                         else:
                             # if no user is searching, add him to the list of searching users.
                             # TODO later when you can search for specific gender, this condition must be changed
                             self.searching_users.append(user_id)
-                            self.bot.send_message(user_id, bot_sends + "Added you to the searching users!").wait()
+                            self.bot.send_message(user_id, bot_sends + "Added you to the searching users!", parse_mode="Markdown").wait()
 
                     elif user_id in self.searching_users:
-                        self.bot.send_message(user_id, bot_sends + "You are already searching. Please wait!").wait()
+                        self.bot.send_message(user_id, bot_sends + "You are already searching. Please wait!", parse_mode="Markdown").wait()
 
                     if (command == "stop") and ((user_id in self.searching_users) or (self.user_already_chatting(user_id) >= 0)):
 
@@ -109,8 +109,8 @@ class Main(object):
                             del self.chatting_users[partner_index]
 
                             # send message that other user left the chat
-                            self.bot.send_message(partner_id, bot_sends + "Your partner left the chat").wait()
-                            self.bot.send_message(user_id, bot_sends + "You left the chat!").wait()
+                            self.bot.send_message(partner_id, bot_sends + "Your partner left the chat", parse_mode="Markdown").wait()
+                            self.bot.send_message(user_id, bot_sends + "You left the chat!", parse_mode="Markdown").wait()
 
                 # if user is in a chat
                 elif (user_id not in self.searching_users) and (self.user_already_chatting(user_id) >= 0):
@@ -119,9 +119,9 @@ class Main(object):
                     # additional check, that there is indeed a partner.
                     if partner_id != -1:
                         if message_type == MessageTypes.TYPE_TEXT:
-                            #send the following message using html syntax
+                            # send the following message using html syntax
                             message = stranger_sends + html.escape(text_orig)
-                            self.bot.send_message(partner_id, message).wait()
+                            self.bot.send_message(partner_id, message, parse_mode="HTML").wait()
                         elif message_type == MessageTypes.TYPE_STICKER:
                             self.bot.send_sticker(partner_id, update.message.sticker.file_id).wait()
                     else:
