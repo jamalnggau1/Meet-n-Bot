@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Rico'
 
+import html
 from twx.botapi import TelegramBot
 from app.update_handler import get_updates
 from app.message_types import MessageTypes
@@ -24,6 +25,8 @@ class Main(object):
                 self.analyze_messages()
 
     def analyze_messages(self):
+        bot_sends = "\U0001F916 *Bot:* "
+        stranger_sends = "\U0001F464 <b>Stranger:</b> " 
         try:
             while len(self.left_msgs) > 0:
                 update = self.left_msgs[0]
@@ -55,8 +58,9 @@ class Main(object):
                     # Setting type to "text", so that the partner get's notified of it
                     print("* Someone sent some unsupported media*")
                     message_type = MessageTypes.TYPE_TEXT
-                    text_orig = "* Your chat partner sent some unsupported media, sorry. *"
-                    text = "* Your chat partner sent some unsupported media, sorry. *"
+                    # TODO here is a potential risk!
+                    text_orig = bot_sends + "*Your chat partner sent some unsupported media, sorry. *"
+                    text = bot_sends + "*Your chat partner sent some unsupported media, sorry. *"
 
                 user_id = update.message.sender.id
                 # first_name = update.message.sender.first_name
@@ -79,17 +83,16 @@ class Main(object):
                             self.chatting_users.append([user_id, partner_id])
                             self.chatting_users.append([partner_id, user_id])
 
-                            self.bot.send_message(user_id, "You are connected to a stranger. Have fun and be nice!").wait()
-                            self.bot.send_message(partner_id, "You are connected to a stranger. Have fun and be nice!").wait()
+                            self.bot.send_message(user_id, bot_sends + "You are connected to a stranger. Have fun and be nice!", parse_mode="Markdown").wait()
+                            self.bot.send_message(partner_id, bot_sends + "You are connected to a stranger. Have fun and be nice!", parse_mode="Markdown").wait()
                         else:
                             # if no user is searching, add him to the list of searching users.
                             # TODO later when you can search for specific gender, this condition must be changed
                             self.searching_users.append(user_id)
-                            self.bot.send_message(user_id, "Added you to the searching users!").wait()
+                            self.bot.send_message(user_id, bot_sends + "Added you to the searching users!", parse_mode="Markdown").wait()
 
                     elif (command == "start") and (user_id in self.searching_users):
-                        self.bot.send_message(user_id, "You are already searching. Please wait!").wait()
-
+                        self.bot.send_message(user_id, bot_sends + "You are already searching. Please wait!", parse_mode="Markdown").wait()
                     if (command == "stop") and ((user_id in self.searching_users) or (self.user_already_chatting(user_id) >= 0)):
 
                         if user_id in self.searching_users:
@@ -108,8 +111,8 @@ class Main(object):
                             del self.chatting_users[partner_index]
 
                             # send message that other user left the chat
-                            self.bot.send_message(partner_id, "Your partner left the chat").wait()
-                            self.bot.send_message(user_id, "You left the chat!").wait()
+                            self.bot.send_message(partner_id, bot_sends + "Your partner left the chat", parse_mode="Markdown").wait()
+                            self.bot.send_message(user_id, bot_sends + "You left the chat!", parse_mode="Markdown").wait()
 
                 # if user is in a chat
                 elif (user_id not in self.searching_users) and (self.user_already_chatting(user_id) >= 0):
@@ -118,8 +121,8 @@ class Main(object):
                     # additional check, that there is indeed a partner.
                     if partner_id != -1:
                         if message_type == MessageTypes.TYPE_TEXT:
-                            message = "Stranger: " + text_orig
-                            self.bot.send_message(partner_id, message).wait()
+                            message = stranger_sends + html.escape(text_orig)
+                            self.bot.send_message(partner_id, message, parse_mode="HTML").wait()
                         elif message_type == MessageTypes.TYPE_PHOTO:
                             file_id = ""
                             last_file_size = 0
