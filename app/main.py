@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Rico'
 
 import html
 from twx.botapi import TelegramBot
-from app.update_handler import get_updates
+# from app.update_handler import get_updates
 from app.message_types import MessageTypes
+from database.db_wrapper import DBwrapper
+
+__author__ = 'Rico'
 
 
 class Main(object):
