@@ -20,7 +20,7 @@ class Main(object):
 
     def update_loop(self):
         while True:
-            update_list = get_updates(self.offset, self.bot)
+            update_list = self.bot.get_updates(self.offset + 1).wait()
             # Most probably "left_msgs" will be empty. That way we can just assign left_msgs = update_list
             if update_list:
                 for line in update_list:
