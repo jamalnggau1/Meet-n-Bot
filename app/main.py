@@ -15,6 +15,7 @@ class Main(object):
     offset = 0
     left_msgs = [[]] * 0
     chatting_users = [[]] * 0
+    # TODO searching_users list must have as many fields, as there are search filters + 1.
     searching_users = []
     DEV_ID = 24421134
 
