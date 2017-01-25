@@ -21,6 +21,7 @@ class Main(object):
     def update_loop(self):
         while True:
             update_list = get_updates(self.offset, self.bot)
+            # Most probably "left_msgs" will be empty. That way we can just assign left_msgs = update_list
             if update_list:
                 for line in update_list:
                     self.left_msgs.append(line)
@@ -37,7 +38,7 @@ class Main(object):
                 text = ""
                 message_type = 0
 
-                #TODO auto remove chats if no message for a certain time?
+                # TODO auto remove chats if no message for a certain time?
 
                 if isinstance(update.message.text, str):
                     # If message is text
@@ -57,10 +58,10 @@ class Main(object):
                 elif update.message.document is not None:
                     message_type = MessageTypes.TYPE_FILE
                 else:
-                    # Setting type to "text", so that the partner get's notified of it
+                    # Setting type to "text", so that the partner get's notified when chatpartner sends unsupported media.
                     print("* Someone sent some unsupported media*")
                     message_type = MessageTypes.TYPE_TEXT
-                    # TODO here is a potential risk!
+                    # TODO here is a potential risk with Markdown!
                     text_orig = bot_sends + "*Your chat partner sent some unsupported media, sorry. *"
                     text = bot_sends + "*Your chat partner sent some unsupported media, sorry. *"
 
@@ -68,7 +69,7 @@ class Main(object):
                 # first_name = update.message.sender.first_name
                 # update_id = update.update_id
 
-                # If message is a command
+                # If the message is a command
                 if text.startswith("/"):
                     command = str(text[1:])
                     command_orig = str(text_orig[1:]) # just in case the original text is needed
@@ -166,6 +167,8 @@ class Main(object):
         return -1
 
     # checks if user is already chatting with someone
+    # returns index in the list if yes
+    # returns -1 if user is not chatting
     def user_already_chatting(self, user_id):
         counter = 0
         if len(self.chatting_users) > 0:
@@ -176,6 +179,9 @@ class Main(object):
 
         return -1
 
+    # checks if a user is already searching for a chat partner
+    # returns index in list of searching users, if yes
+    # returns -1 if user is not searching
     def user_already_searching(self, user_id):
         counter = 0
         if len(self.searching_users) > 0:
