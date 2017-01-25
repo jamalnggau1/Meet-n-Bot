@@ -66,13 +66,11 @@ class Main(object):
                     text = bot_sends + "*Your chat partner sent some unsupported media, sorry. *"
 
                 user_id = update.message.sender.id
-                # first_name = update.message.sender.first_name
-                # update_id = update.update_id
 
                 # If the message is a command
                 if text.startswith("/"):
                     command = str(text[1:])
-                    command_orig = str(text_orig[1:]) # just in case the original text is needed
+                    # command_orig = str(text_orig[1:])  # just in case the original text is needed
 
                     if (command == "start") and (user_id not in self.searching_users) and (self.user_already_chatting(user_id) == -1):
                         # search for another "searching" user in searching_users list
