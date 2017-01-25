@@ -198,6 +198,7 @@ class Main(object):
             print("Un-Answered Messages: " + str(len(self.left_msgs)))
 
     def __init__(self):
+        self.database = DBwrapper()
         print("Bot started!")
 
 
