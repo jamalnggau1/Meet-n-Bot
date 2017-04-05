@@ -53,7 +53,6 @@ def is_user_already_searching( user_id):
 def start(bot, update):
     user_id = update.message.from_user.id
 
-    print("start")
     if (user_id not in searching_users) and (is_user_already_chatting(user_id) == -1):
         # search for another "searching" user in searching_users list
         if len(searching_users) > 0:
@@ -78,12 +77,10 @@ def start(bot, update):
                                   parse_mode="Markdown")
     elif user_id in searching_users:
         bot.send_message(user_id, bot_sends + "You are already searching. Please wait!", parse_mode="Markdown")
-    pass
 
 
 def stop(bot, update):
     user_id = update.message.from_user.id
-    print("stop")
 
     if (user_id in searching_users) or (is_user_already_chatting(user_id) >= 0):
 
@@ -111,7 +108,6 @@ def stop(bot, update):
 def messages(bot, update):
     user_id = update.message.from_user.id
     text = update.message.text
-    print("message")
 
     if text is not None and text is not "":
         # If message is text
